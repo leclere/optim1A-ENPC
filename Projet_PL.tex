@@ -1,0 +1,128 @@
+
+
+
+\documentclass[10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,textcomp,eurosym}
+\usepackage[margin=1.5cm]{geometry}
+
+\usepackage{latexsym}     % Pour certains symboles (\Box, ...)
+\usepackage{amsmath}      % Environnement AMS
+\usepackage{amsthm}       % avec theoremes
+\usepackage{amsfonts}     % et fonts associees
+\usepackage{amssymb}      % et symboles
+\newcommand{\eur}{\geneuro }
+\usepackage{enumitem}
+
+\def\x{\mathbf{x}}
+\def\R{\mathbb{R}}
+\def\btheta{\boldsymbol{\theta}}
+
+\title{Projet personnel - Introduction à l'optimisation}
+\author{vincent.leclere@enpc.fr}
+
+\begin{document}
+
+
+
+\maketitle
+
+{\em Les sections sont largement indépendantes et de difficultés croissantes. }
+
+\section{Présentation du problème et théorie}
+
+On suppose qu'un processeur doit traiter $n$ tâches, potentiellement en parallèle. Chaque tâche $i\in[n]$
+nécessitant une charge de travail totale $w_i \geq 0$, qui doit être effectuée entre l'instant
+$d_i$ et l'instant $f_i$. On note $x_t \geq 0$ la quantité de travail effectuée à la période
+$t \in [T]$.
+On noteras $y_t^i \geq 0$ la quantité de travail concernant
+la tâche $i$ traitée à l'instant $t$. Cette quantité est décidé par le gestionnaire du calculateur.
+On note $\varphi(x_t)$ la quantité d'énergie nécessaire au processeur à l'instant
+$t$ pour traiter une charge totale $x_t = \sum_{i=1}^N y_t^i$.
+Finalement, à chaque instant $t\in[T]$ on souhaite
+que le processeur ait une charge de travail $x_t \in [\underline{x},\bar{x}]$.
+Dans tout le projet on supposera qu'il existe un planning de charge réalisable $(x_t)_{t\in[T]}$.
+
+\begin{enumerate}
+ \item On considère l'ensemble
+ $$X = \{x \in [\underline{x},\bar{x}]^T \quad | \quad \exists y \in \R_+^{nT}, \; \forall i\in[n],\; \sum_{t=d_i}^{f_i}y_t^i = w_i\}$$
+ Justifier que $X$ est l'ensemble des plannings de charge réalisables. Que pouvez vous dire de sa géométrie ?
+ \item \'Ecrire un problème d'optimisation $(P)$ qui a pour but de minimiser l'énergie totale dépensée pour traiter l'ensemble des tâches $i\in[N]$ en temps et en heure.
+ \item Si $\varphi$ est convexe différentiable, montrer qu'il s'agit d'un problème d'optimisation convexe différentiable.
+ \item Supposons que $\varphi$ soit affine, i.e. $\varphi : x  \mapsto ax + b $ avec $a,b\in\R$.
+ Calculer la valeur d'un planning réalisable $x$. Un solveur linéaire est-il utile ?
+ \item Si $\varphi$ est un polynôme de degré $2$ donner une condition simple pour que le problème soit convexe.
+\end{enumerate}
+
+\section{Résolution du problème à l'aide de Julia}
+On considère $N=10$ tâches, sur un horizon de $T=12$ pas de temps. On suppose que $\varphi(x) = \alpha x^2+ \beta x + \gamma $ est un polynôme de degré deux. On choisit les paramètres suivant
+\begin{itemize}
+	\item $\alpha = 1$, $\beta=1$, $\gamma = 1$
+	\item $\mathbf{d}=\textrm{[1 1 5 7 7 8 6 7 8 9]}$
+	\item $\mathbf{f}=\textrm{[2 3 5 9 10 8 9 10 12 12]}$
+	\item $\underline{x}=1$, $\bar{x} = 10$
+	\item $\mathbf{w}=\textrm{[10 10 3 7 10 2 2 2 7.5 7.5]}$
+\end{itemize}
+\begin{enumerate}[resume]
+	\item Modéliser le problème $(P)$ à l'aide de Julia / JuMP et résoudre le problème.
+	Calculer un planning de charge optimal, ainsi que la quantité d'énergie minimum $v_P$ pour traiter l'ensemble des tâches.
+	\item Pour cette question uniquement on ajoute une contrainte de rampe sur la puissance de calcul, plus précisément on souhaite que la charge de travail totale $x_{t+1}$ à l'instant $t+1$ ne soit pas plus de $1$ au dessus ou en dessous de la charge de travail totale $x_t$ à l'instant $t$ (la charge de travail initiale $x_1$ n'est pas contrainte).
+	\begin{enumerate}
+		\item quelles contraintes mathématique faut-il ajouter pour représenter cette contrainte de rampe ?
+		\item la représenter sous forme de contraintes linéaires, et l'introduire dans le problème JuMP. Calculer un planning de charge optimal ainsi que la nouvelle quantité d'énergie minimum. Comparer à la question précédente.
+	\end{enumerate}
+\end{enumerate}
+
+%{\bf Nous ne conservons pas la contrainte de rampe pour la suite du projet.}
+
+\section{Un nouvel objectif}
+Dans cette section nous cherchons à minimiser la date de fin de traitement de l'ensemble des tâches.
+\begin{enumerate}[resume]
+	\item Appelons $\tau \in [12]$ la date à laquelle toutes les tâches sont traitées. Proposer une méthode itérative permettant de trouver un planning de charge minimisant $\tau$.
+	\item Résoudre avec JuMP ce problème sur les données numériques de la section $2$.
+	\item Proposer une démarche permettant de trouver, parmis les planning ayant un $\tau$ minimal, un planning minimisant l'énergie totale dépensée.
+\end{enumerate}
+
+\section{Des approximations linéaires de $(P)$}
+
+{\em Cette partie est légèrement plus difficile que les précédentes. Elle permet de dépasser le 15/20.}
+
+Le problème traité est un problème linéaire-quadratique convexe, plus difficile à résoudre qu'un problème linéaire. Nous allons construire des approximations linéaires du problème, que nous pourrons résoudre à l'aide d'un solveur linéaire (Clp). Rappelons que $\varphi:x\mapsto \alpha x^2 + \beta x + \gamma$ est supposée convexe.
+\begin{enumerate}[resume]
+	\item Montrer que $(P)$ est équivalent à $(P+)$ défini par
+		\begin{align*}
+		(P+) \qquad \min_{\x \in X, \btheta \in \R^T} \quad & \sum_{t=1}^T \theta_t \\
+		\mbox{s.c.} \quad & \theta_t \geq \varphi(x_t)
+		\end{align*}
+
+
+	\item Pour $k\in\mathbb{N}$ fixé, nous allons construire une approximation extérieure $(P^{out}_k)$. Soit $k$ réels $x_i\in [\underline{x},\bar{x}]$, tels que $\underline{x} = x_1 \leq \dots \leq x_k = \bar{x}$. On définit
+		$$ \underline{\varphi}^k : x \mapsto \max_{j\in[k]} \; \{\varphi(x^k) + \varphi'(x^k)(x-x^k)\}.$$
+		On définit le problème $(P^{out}_k)$ comme
+		\begin{align*}
+		(P^{out}_k) \qquad \min_{\x \in X, \theta \in \R^T} \quad & \sum_{t=1}^T \theta_t \\
+		\mbox{s.c.} \quad & \theta_t \geq \underline{\varphi}^k(x_t)
+		\end{align*}
+	\begin{enumerate}
+		\item Justifier que $(P^{out}_k)$ est un problème linéaire. De plus montrer que si $(\x, \btheta)$ est une solution admissible de $(P^{out}_k)$, alors $\x$ est un planning de charge admissible.
+		\item Montrer que, pour tout $x \in \R$, $\varphi(x) \geq \underline{\varphi}^k(x)$.
+		\item En déduire que la valeur $v^{out}_k$ du problème $(P^{out}_k)$ est une borne inférieure de $v_P$ la valeur du problème $(P)$.
+		\item Comment déduire de la solution de $(P^{out}_k)$ une borne supérieure de $v_P$ ?
+	\end{enumerate}
+	\item En choisissant $x_i = i$ pour $i\in [10]$ résoudre à l'aide de JuMP le problème $(P^{out}_{10})$. En déduire une borne inférieure et une borne supérieure de $v_P$.
+	\item Construisons une approximation intérieure $(P^{in}_k)$.
+	\begin{enumerate}
+		\item A l'aide de la convexité trouver une fonction linéaire par morceaux $\bar{\varphi}^k$ qui majore $\varphi$ sur $[\underline{x},\bar{x}]$ et qui coïncide avec $\varphi$ aux points $\underline{x} = x_1 \leq \dots \leq x_k = \bar{x}$.
+		\item En déduire un problème linéaire $(P^{in}_k)$ analogue à $(P^{out}_k)$.
+		\item Comment déduire de la résolution de $(P^{in}_k)$ deux bornes supérieures de $v_P$. Montrez que l'une des deux est supérieure à l'autre.
+	\end{enumerate}
+	\item {\em (Pour aller plus loin)} En prenant des points $(x_i)_{i\in[k]}$ équirépartis sur $[\underline{x},\bar{x}]$ calculez, à l'aide de Julia, les 4 bornes précédentes pour $k=10$, $k=50$ et $k=100$. Commentez.
+\end{enumerate}
+
+
+{\em Le rapport est à envoyer par mail à votre chargé de TD pour le 17
+Octobre 2017. L'évaluation sera faite sur le rendu complété d'un entretien
+avec expérimentation potentielle du modèle (apporter son ordinateur pour
+l'entretien).}
+
+\end{document}
