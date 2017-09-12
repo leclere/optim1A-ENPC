@@ -33,19 +33,19 @@
 
 On suppose qu'un processeur doit traiter $n$ tâches, potentiellement en parallèle. Chaque tâche $i\in[n]$
 nécessitant une charge de travail totale $w_i \geq 0$, qui doit être effectuée entre l'instant
-$d_i$ et l'instant $f_i$. On note $x_t \geq 0$ la quantité de travail effectuée à la période
+$d_i$ et l'instant $f_i$. On note $x_t \geq 0$ la quantité de travail effectuée à l'instant
 $t \in [T]$.
 On noteras $y_t^i \geq 0$ la quantité de travail concernant
 la tâche $i$ traitée à l'instant $t$. Cette quantité est décidé par le gestionnaire du calculateur.
 On note $\varphi(x_t)$ la quantité d'énergie nécessaire au processeur à l'instant
 $t$ pour traiter une charge totale $x_t = \sum_{i=1}^N y_t^i$.
 Finalement, à chaque instant $t\in[T]$ on souhaite
-que le processeur ait une charge de travail $x_t \in [\underline{x},\bar{x}]$.
+que le processeur ait une charge de travail $x_t \in [\underline{x},\overline{x}]$.
 Dans tout le projet on supposera qu'il existe un planning de charge réalisable $(x_t)_{t\in[T]}$.
 
 \begin{enumerate}
  \item On considère l'ensemble
- $$X = \{x \in [\underline{x},\bar{x}]^T \quad | \quad \exists y \in \R_+^{nT}, \; \forall i\in[n],\; \sum_{t=d_i}^{f_i}y_t^i = w_i\}$$
+ $$X = \{x \in [\underline{x},\overline{x}]^T \quad | \quad \exists y \in \R_+^{nT}, \; \forall i\in[n],\; \sum_{t=d_i}^{f_i}y_t^i = w_i\}$$
  Justifier que $X$ est l'ensemble des plannings de charge réalisables. Que pouvez vous dire de sa géométrie ?
  \item \'Ecrire un problème d'optimisation $(P)$ qui a pour but de minimiser l'énergie totale dépensée pour traiter l'ensemble des tâches $i\in[N]$ en temps et en heure.
  \item Si $\varphi$ est convexe différentiable, montrer qu'il s'agit d'un problème d'optimisation convexe différentiable.
@@ -60,7 +60,7 @@ On considère $N=10$ tâches, sur un horizon de $T=12$ pas de temps. On suppose 
 	\item $\alpha = 1$, $\beta=1$, $\gamma = 1$
 	\item $\mathbf{d}=\textrm{[1 1 5 7 7 8 6 7 8 9]}$
 	\item $\mathbf{f}=\textrm{[2 3 5 9 10 8 9 10 12 12]}$
-	\item $\underline{x}=1$, $\bar{x} = 10$
+	\item $\underline{x}=1$, $\overline{x} = 10$
 	\item $\mathbf{w}=\textrm{[10 10 3 7 10 2 2 2 7.5 7.5]}$
 \end{itemize}
 \begin{enumerate}[resume]
@@ -80,7 +80,7 @@ Dans cette section nous cherchons à minimiser la date de fin de traitement de l
 \begin{enumerate}[resume]
 	\item Appelons $\tau \in [12]$ la date à laquelle toutes les tâches sont traitées. Proposer une méthode itérative permettant de trouver un planning de charge minimisant $\tau$.
 	\item Résoudre avec JuMP ce problème sur les données numériques de la section $2$.
-	\item Proposer une démarche permettant de trouver, parmis les planning ayant un $\tau$ minimal, un planning minimisant l'énergie totale dépensée.
+	\item Proposer une démarche permettant de trouver, parmi les planning ayant un $\tau$ minimal, un planning minimisant l'énergie totale dépensée.
 \end{enumerate}
 
 \section{Des approximations linéaires de $(P)$}
@@ -96,8 +96,8 @@ Le problème traité est un problème linéaire-quadratique convexe, plus diffic
 		\end{align*}
 
 
-	\item Pour $k\in\mathbb{N}$ fixé, nous allons construire une approximation extérieure $(P^{out}_k)$. Soit $k$ réels $x_i\in [\underline{x},\bar{x}]$, tels que $\underline{x} = x_1 \leq \dots \leq x_k = \bar{x}$. On définit
-		$$ \underline{\varphi}^k : x \mapsto \max_{j\in[k]} \; \{\varphi(x^k) + \varphi'(x^k)(x-x^k)\}.$$
+	\item Pour $k\in\mathbb{N}$ fixé, nous allons construire une approximation extérieure $(P^{out}_k)$. Soit $k$ réels $x_i\in [\underline{x},\overline{x}]$, tels que $\underline{x} = x_1 \leq \dots \leq x_k = \overline{x}$. On définit
+		$$ \underline{\varphi}^k : x \mapsto \max_{j\in[k]} \; \{\varphi(x_j) + \varphi'(x_j)(x-x_j)\}.$$
 		On définit le problème $(P^{out}_k)$ comme
 		\begin{align*}
 		(P^{out}_k) \qquad \min_{\x \in X, \theta \in \R^T} \quad & \sum_{t=1}^T \theta_t \\
@@ -112,11 +112,11 @@ Le problème traité est un problème linéaire-quadratique convexe, plus diffic
 	\item En choisissant $x_i = i$ pour $i\in [10]$ résoudre à l'aide de JuMP le problème $(P^{out}_{10})$. En déduire une borne inférieure et une borne supérieure de $v_P$.
 	\item Construisons une approximation intérieure $(P^{in}_k)$.
 	\begin{enumerate}
-		\item A l'aide de la convexité trouver une fonction linéaire par morceaux $\bar{\varphi}^k$ qui majore $\varphi$ sur $[\underline{x},\bar{x}]$ et qui coïncide avec $\varphi$ aux points $\underline{x} = x_1 \leq \dots \leq x_k = \bar{x}$.
+		\item A l'aide de la convexité trouver une fonction linéaire par morceaux $\overline{\varphi}^k$ qui majore $\varphi$ sur $[\underline{x},\overline{x}]$ et qui coïncide avec $\varphi$ aux points $\underline{x} = x_1 \leq \dots \leq x_k = \overline{x}$.
 		\item En déduire un problème linéaire $(P^{in}_k)$ analogue à $(P^{out}_k)$.
 		\item Comment déduire de la résolution de $(P^{in}_k)$ deux bornes supérieures de $v_P$. Montrez que l'une des deux est supérieure à l'autre.
 	\end{enumerate}
-	\item {\em (Pour aller plus loin)} En prenant des points $(x_i)_{i\in[k]}$ équirépartis sur $[\underline{x},\bar{x}]$ calculez, à l'aide de Julia, les 4 bornes précédentes pour $k=10$, $k=50$ et $k=100$. Commentez.
+	\item {\em (Pour aller plus loin)} En prenant des points $(x_i)_{i\in[k]}$ équirépartis sur $[\underline{x},\overline{x}]$ calculez, à l'aide de Julia, les 4 bornes précédentes pour $k=10$, $k=50$ et $k=100$. Commentez.
 \end{enumerate}
 
 
