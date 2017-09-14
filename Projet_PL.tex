@@ -45,7 +45,8 @@ Dans tout le projet on supposera qu'il existe un planning de charge réalisable 
 
 \begin{enumerate}
  \item On considère l'ensemble
- $$X = \{x \in [\underline{x},\overline{x}]^T \quad | \quad \exists y \in \R_+^{nT}, \; \forall i\in[n],\; \sum_{t=d_i}^{f_i}y_t^i = w_i\}$$
+ $$X = \left\{x \in [\underline{x},\overline{x}]^T \quad \bigg| \quad \exists y \in \R_+^{nT}, \; \forall i\in[n],\; \sum_{t=d_i}^{f_i}y_t^i = w_i, \quad \sum_{t=1}^{d_i-1} y_t^i=0, \quad \sum_{t=f_i +1}^{T} y_t^i=0
+ \right\}$$
  Justifier que $X$ est l'ensemble des plannings de charge réalisables. Que pouvez vous dire de sa géométrie ?
  \item \'Ecrire un problème d'optimisation $(P)$ qui a pour but de minimiser l'énergie totale dépensée pour traiter l'ensemble des tâches $i\in[N]$ en temps et en heure.
  \item Si $\varphi$ est convexe différentiable, montrer qu'il s'agit d'un problème d'optimisation convexe différentiable.
@@ -58,10 +59,10 @@ Dans tout le projet on supposera qu'il existe un planning de charge réalisable 
 On considère $N=10$ tâches, sur un horizon de $T=12$ pas de temps. On suppose que $\varphi(x) = \alpha x^2+ \beta x + \gamma $ est un polynôme de degré deux. On choisit les paramètres suivant
 \begin{itemize}
 	\item $\alpha = 1$, $\beta=1$, $\gamma = 1$
-	\item $\mathbf{d}=\textrm{[1 1 5 7 7 8 6 7 8 9]}$
+	\item $\mathbf{d}=\textrm{[1 1 4 7 7 8 6 7 8 9]}$
 	\item $\mathbf{f}=\textrm{[2 3 5 9 10 8 9 10 12 12]}$
 	\item $\underline{x}=1$, $\overline{x} = 10$
-	\item $\mathbf{w}=\textrm{[10 10 3 7 10 2 2 2 7.5 7.5]}$
+	\item $\mathbf{w}=\textrm{[11 10 2 7 10 2 2 2 7.5 7.5]}$
 \end{itemize}
 \begin{enumerate}[resume]
 	\item Modéliser le problème $(P)$ à l'aide de Julia / JuMP et résoudre le problème.
