@@ -67,7 +67,7 @@ On considère $N=10$ tâches, sur un horizon de $T=12$ pas de temps. On suppose 
 \begin{enumerate}[resume]
 	\item Modéliser le problème $(P)$ à l'aide de Julia / JuMP et résoudre le problème.
 	Calculer un planning de charge optimal, ainsi que la quantité d'énergie minimum $v_P$ pour traiter l'ensemble des tâches.
-	\item Pour cette question uniquement on ajoute une contrainte de rampe sur la puissance de calcul, plus précisément on souhaite que la charge de travail totale $x_{t+1}$ à l'instant $t+1$ ne soit pas plus de $1$ au dessus ou en dessous de la charge de travail totale $x_t$ à l'instant $t$ (la charge de travail initiale $x_1$ n'est pas contrainte).
+	\item Pour cette question uniquement on ajoute une contrainte de rampe sur la puissance de calcul, plus précisément on souhaite que la charge de travail totale $x_{t+1}$ à l'instant $t+1$ ne soit pas plus de $3$ au dessus ou en dessous de la charge de travail totale $x_t$ à l'instant $t$ (la charge de travail initiale $x_1$ n'est pas contrainte).
 	\begin{enumerate}
 		\item quelles contraintes mathématique faut-il ajouter pour représenter cette contrainte de rampe ?
 		\item la représenter sous forme de contraintes linéaires, et l'introduire dans le problème JuMP. Calculer un planning de charge optimal ainsi que la nouvelle quantité d'énergie minimum. Comparer à la question précédente.
